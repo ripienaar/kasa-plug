@@ -18,6 +18,7 @@ var (
 
 func main() {
 	app := kingpin.New("kasa-plug", "Manages TP-Link Kasa HS1xx Smart Plugs")
+	app.Version("0.0.1")
 	app.Flag("plug", "IP address or hostname of the plug").Required().StringVar(&ipaddress)
 
 	icmd := app.Command("info", "Retrieves device information")
