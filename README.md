@@ -7,6 +7,39 @@ A small utility to manage TP Link Kasa Homeplugs.
 Full details are available using `--help`, here are some example commands:
 
 ```
+$ kasa-plug --help
+usage: kasa-plug --plug=PLUG [<flags>] <command> [<args> ...]
+
+Manages TP-Link Kasa HS1xx Smart Plugs
+
+Flags:
+  --help       Show context-sensitive help (also try --help-long and --help-man).
+  --plug=PLUG  IP address or hostname of the plug
+
+Commands:
+  help [<command>...]
+    Show help.
+
+  info [<flags>]
+    Retrieves device information
+
+  energy [<flags>]
+    Retrieves energy usage information
+
+  on
+    Turns the plug on
+
+  off
+    Turns the plug off
+
+  reboot
+    Reboots the plug
+
+  status
+    Retrieves power state
+```
+
+```
 $ kasa-plug --plug dehumidifier-plug info
 TP-Link Kasa Plug 'Dehumidifier' @ dehumidifier-plug
 
