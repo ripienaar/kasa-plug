@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	ipaddress  string
-	jsonFormat bool
-	hs1xx      *hs1xxplug.Plug
+	ipaddress    string
+	jsonFormat   bool
+	choriaFormat bool
+	hs1xx        *hs1xxplug.Plug
 )
 
 func main() {
@@ -26,6 +27,7 @@ func main() {
 
 	ecmd := app.Command("energy", "Retrieves energy usage information")
 	ecmd.Flag("json", "Show JSON output").BoolVar(&jsonFormat)
+	ecmd.Flag("choria", "Choria metrics format").BoolVar(&choriaFormat)
 
 	app.Command("on", "Turns the plug on")
 	app.Command("off", "Turns the plug off")
@@ -63,6 +65,11 @@ func energy() {
 		hs1xxplug.Energy
 	}
 
+	type choria struct {
+		Labels  map[string]string  `json:"labels"`
+		Metrics map[string]float64 `json:"metrics"`
+	}
+
 	energynfo, err := hs1xx.Energy()
 	kingpin.FatalIfError(err, "Could not retrieve plug information")
 
@@ -83,11 +90,33 @@ Power On Time: {{.OnTime}} ({{.OnTimeSeconds}} seconds)
          Volt: {{.Volt}} V
 `
 
-	if jsonFormat {
+	switch {
+	case jsonFormat:
 		out, err := json.Marshal(data)
 		kingpin.FatalIfError(err, "Could not JSON encode data")
 		fmt.Printf(string(out))
-	} else {
+	case choriaFormat:
+		data := &choria{
+			Labels: map[string]string{
+				"address": data.Info.Address,
+				"alias":   data.Info.Alias,
+				"model":   data.Info.Model,
+				"id":      data.Info.DeviceID,
+			},
+			Metrics: map[string]float64{
+				"current_amp":  float64(data.Energy.Amp),
+				"voltage_volt": float64(data.Energy.Volt),
+				"power_watt":   float64(data.Energy.PowerUseWatt),
+				"total_watt":   float64(data.Energy.TotalWatt),
+				"power_state":  float64(data.Info.RelayState),
+				"on_seconds":   float64(data.Info.OnTimeSeconds),
+			},
+		}
+		out, err := json.Marshal(data)
+		kingpin.FatalIfError(err, "Could not JSON encode data")
+		fmt.Printf(string(out))
+
+	default:
 		tmpl, err := template.New("plug").Parse(report)
 		kingpin.FatalIfError(err, "Could not process template")
 

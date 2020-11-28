@@ -1,8 +1,0 @@
-package: github.com/ripienaar/kasa-plug
-import:
-- package: github.com/tidwall/gjson
-  version: ^1.2.1
-- package: gopkg.in/alecthomas/kingpin.v2
-  version: ^2.2.6
-- package: github.com/tidwall/pretty
-- package: github.com/ripienaar/hs1xxplug
